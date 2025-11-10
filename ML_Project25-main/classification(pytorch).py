@@ -118,7 +118,7 @@ def classify_dataset(train_file, train_label_file, test_file, output_file,
 
 
 if __name__ == '__main__':
-    classify_dataset('TrainData1.txt', 'TrainLabel1.txt', 'TestData1.txt', 'ClassificationTestResult1.txt')
-    classify_dataset('TrainData2.txt', 'TrainLabel2.txt', 'TestData2.txt', 'ClassificationTestResult2.txt')
-    classify_dataset('TrainData3.txt', 'TrainLabel3.txt', 'TestData3.txt', 'ClassificationTestResult3.txt')
-    classify_dataset('TrainData4.txt', 'TrainLabel4.txt', 'TestData4.txt', 'ClassificationTestResult4.txt')
+    classify_dataset('TrainData1.txt', 'TrainLabel1.txt', 'TestData1.txt', 'NNTestResult1.txt')
+    classify_dataset('TrainData2.txt', 'TrainLabel2.txt', 'TestData2.txt', 'NNTestResult2.txt')
+    classify_dataset('TrainData3.txt', 'TrainLabel3.txt', 'TestData3.txt', 'NNTestResult3.txt')
+    classify_dataset('TrainData4.txt', 'TrainLabel4.txt', 'TestData4.txt', 'NNTestResult4.txt')

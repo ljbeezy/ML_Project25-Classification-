@@ -42,7 +42,7 @@ def classify_dataset(train_file, train_label_file, test_file, output_file):
     print(f"Saved predictions to {output_file}\n")
 
 
-classify_dataset('TrainData1.txt', 'TrainLabel1.txt', 'TestData1.txt', 'ClassificationTestResultS1.txt')
-classify_dataset('TrainData2.txt', 'TrainLabel2.txt', 'TestData2.txt', 'ClassificationTestResultS2.txt')
-classify_dataset('TrainData3.txt', 'TrainLabel3.txt', 'TestData3.txt', 'ClassificationTestResultS3.txt')
-classify_dataset('TrainData4.txt', 'TrainLabel4.txt', 'TestData4.txt', 'ClassificationTestResultS4.txt')
+classify_dataset('TrainData1.txt', 'TrainLabel1.txt', 'TestData1.txt', 'SVMTestResultS1.txt')
+classify_dataset('TrainData2.txt', 'TrainLabel2.txt', 'TestData2.txt', 'SVMTestResultS2.txt')
+classify_dataset('TrainData3.txt', 'TrainLabel3.txt', 'TestData3.txt', 'SVMTestResultS3.txt')
+classify_dataset('TrainData4.txt', 'TrainLabel4.txt', 'TestData4.txt', 'SVMTestResultS4.txt')
