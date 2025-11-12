@@ -6,6 +6,8 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
+# ...existing code...
+
 
 # Read feature, label, and test arrays from text files
 def load_data(train_file, train_label_file, test_file):
@@ -23,17 +25,27 @@ def load_data(train_file, train_label_file, test_file):
 
 class SimpleMLP(nn.Module):
 
-
-    def __init__(self, input_dim, hidden1=64, hidden2=32, num_classes=2):
+    def __init__(self, input_dim, hidden1=64, hidden2=32, num_classes=2, dropout=0.2):
         super().__init__()
-        # Stack three linear layers with ReLU to build a tiny classifier
+        # Keep network simple: two hidden layers with small dropout
         self.net = nn.Sequential(
             nn.Linear(input_dim, hidden1),
             nn.ReLU(inplace=True),
+            nn.Dropout(dropout),
             nn.Linear(hidden1, hidden2),
             nn.ReLU(inplace=True),
+            nn.Dropout(dropout),
             nn.Linear(hidden2, num_classes),
         )
+        self._init_weights()
+
+    def _init_weights(self):
+        # Xavier init for better starting point
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                nn.init.xavier_uniform_(m.weight)
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
 
     def forward(self, x):
         # Push data through the network and return class scores
@@ -42,8 +54,8 @@ class SimpleMLP(nn.Module):
 
 # Train the neural network on one dataset and store its predictions
 def classify_dataset(train_file, train_label_file, test_file, output_file,
-                     epochs=10, batch_size=32, lr=1e-3,
-                     hidden1=64, hidden2=32, cpu_only=False):
+                     epochs=20, batch_size=32, lr=1e-3,
+                     hidden1=64, hidden2=32, cpu_only=False, dropout=0.2, weight_decay=1e-5):
 
     X_train, y_train, X_test = load_data(train_file, train_label_file, test_file)
 
@@ -82,14 +94,20 @@ def classify_dataset(train_file, train_label_file, test_file, output_file,
 
     # Set up the model, loss function, and optimizer
     model = SimpleMLP(input_dim=input_dim, hidden1=hidden1,
-                      hidden2=hidden2, num_classes=num_classes).to(device)
+                      hidden2=hidden2, num_classes=num_classes, dropout=dropout).to(device)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=lr)
+    optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
-    print(f"Training PyTorch model for {train_file} on device={device}...")
+    # Title / header for clarity between datasets
+    print("\n" + "=" * 72)
+    print(f"Training for dataset:\n  train: {train_file}\n  labels: {train_label_file}\n  test: {test_file}")
+    print("=" * 72)
+
     model.train()
     for epoch in range(1, epochs + 1):
         running_loss = 0.0
+        running_correct = 0
+        running_n = 0
         for xb, yb in train_loader:
             xb = xb.to(device)
             yb = yb.to(device)
@@ -98,11 +116,23 @@ def classify_dataset(train_file, train_label_file, test_file, output_file,
             loss = criterion(outputs, yb)
             loss.backward()
             optimizer.step()
+
+            preds = outputs.argmax(dim=1)
+            running_correct += (preds == yb).sum().item()
+            running_n += xb.size(0)
             running_loss += loss.item() * xb.size(0)
 
-        epoch_loss = running_loss / len(train_ds)
-        if epoch in (1, epochs) or (epochs >= 5 and epoch % max(1, epochs // 5) == 0):
-            print(f"Epoch {epoch}/{epochs} - loss: {epoch_loss:.4f}")
+        epoch_loss = running_loss / running_n if running_n > 0 else 0.0
+        epoch_acc = running_correct / running_n if running_n > 0 else 0.0
+
+        # Print every epoch and add an empty line to separate epochs visually
+        print(f"Epoch {epoch}/{epochs} - loss: {epoch_loss:.4f} - train acc: {epoch_acc:.4f}")
+        print()  # blank line for separation
+
+    # Footer to separate completion of training from evaluation/saving
+    print("-" * 72)
+    print(f"Finished training for {train_file}. Evaluating on test set and saving predictions...")
+    print()
 
     model.eval()
     with torch.no_grad():
