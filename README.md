@@ -35,7 +35,7 @@ pip install torch numpy scikit-learn
 - **AdamW Optimizer**: Better than Adam for weight decay regularization
 - **Weighted Cross-Entropy**: Balances loss for imbalanced classes
 
-### 4. Adaptive Model Selection
+### 3. Adaptive Model Selection
 The **adaptive_model_selection.py** script:
 - Trains all three models (NN, SVM, RF) on each dataset
 - Evaluates using F1-weighted score on validation set
